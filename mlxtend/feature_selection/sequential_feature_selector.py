@@ -192,12 +192,14 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
         verbose=0,
         scoring=None,
         cv=5,
+        early_stop_rounds=0,
         n_jobs=1,
         pre_dispatch="2*n_jobs",
         clone_estimator=True,
         fixed_features=None,
         feature_groups=None,
     ):
+        self.early_stop_rounds = early_stop_rounds
         self.estimator = estimator
         self.k_features = k_features
         self.forward = forward
@@ -531,6 +533,8 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
             }
 
         orig_set = set(range(self.k_ub))
+        best_score = -np.inf
+        early_stop_count = self.early_stop_rounds
         try:
             while k != k_stop:
                 prev_subset = set(k_idx)
@@ -638,6 +642,20 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                 if self._TESTING_INTERRUPT_MODE:  # just to test `KeyboardInterrupt`
                     self.finalize_fit()
                     raise KeyboardInterrupt
+
+                # early stop
+                if self.early_stop_rounds and k != k_stop:
+                    if k_score <= best_score:
+                        print(f"k_score: {k_score:.4f} <= best_score: {best_score:.4f}")
+                        early_stop_count -= 1
+                        if early_stop_count == 0:
+                            print('Performances not improved for %d rounds. '
+                                  'Stopping now!' % self.early_stop_rounds)
+                            break
+                    else:
+                        print(f"k_score: {k_score:.4f} > best_score: {best_score:.4f}")
+                        early_stop_count = self.early_stop_rounds
+                        best_score = k_score
 
         except KeyboardInterrupt:
             self.interrupted_ = True
