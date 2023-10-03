@@ -665,6 +665,7 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         std_dev = np.std(self.subsets_[k]["cv_scores"])
                         scores_ammount = self.subsets_[k]["cv_scores"].shape[0]
                         if k_avg_score >=  max_score - std_dev / scores_ammount:
+                            last_max_score = max_score
                             max_score = k_avg_score
                             best_subset = k
                             sa = self.subsets_.__len__()
@@ -677,10 +678,10 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                             break
 
                     print(f"k_avg_score: {k_avg_score:.4f} >=  "
-                          f"max_score: {max_score:.4f} - std_dev: {std_dev:.4f}"
+                          f"max_score: {last_max_score:.4f} - std_dev: {std_dev:.4f}"
                           f" / scores_ammount: {scores_ammount:.4f} "
                           f"margin: "
-                          f"{k_avg_score - (max_score - std_dev / scores_ammount):.4f}")
+                          f"{k_avg_score - (last_max_score - std_dev / scores_ammount):.4f}")
 
                     print("done")
 
