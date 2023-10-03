@@ -198,7 +198,9 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
         clone_estimator=True,
         fixed_features=None,
         feature_groups=None,
+        tol=None,
     ):
+        self.tol = tol
         self.early_stop_rounds = early_stop_rounds
         self.estimator = estimator
         self.k_features = k_features
@@ -656,6 +658,15 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         print(f"k_score: {k_score:.4f} > best_score: {best_score:.4f}")
                         early_stop_count = self.early_stop_rounds
                         best_score = k_score
+                sl = self.subsets_.__len__()
+                if self.tol and sl > 1:
+                    score_diff = self.subsets_[sl]["avg_score"] - self.subsets_[sl-1][
+                        "avg_score"]
+                    if score_diff < self.tol:
+                        print(f"Tol reached {score_diff} < {self.tol}, break")
+                        break
+                    else:
+                        print(f"Tol not reached {score_diff} > {self.tol}")
 
                 if self.is_parsimonious:
                     max_score = 0
@@ -668,7 +679,7 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                             last_max_score = max_score
                             max_score = k_avg_score
                             best_subset = k
-                            sa = self.subsets_.__len__()
+                            sa = sl
                             # if k != sa:
                             #     print(f"Best subset is last ({k})")
                             # else:
