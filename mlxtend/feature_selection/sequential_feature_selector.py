@@ -657,6 +657,33 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         early_stop_count = self.early_stop_rounds
                         best_score = k_score
 
+                if self.is_parsimonious:
+                    max_score = 0
+                    for k in self.subsets_:
+
+                        k_avg_score = self.subsets_[k]["avg_score"]
+                        std_dev = np.std(self.subsets_[k]["cv_scores"])
+                        scores_ammount = self.subsets_[k]["cv_scores"].shape[0]
+                        if k_avg_score >=  max_score - std_dev / scores_ammount:
+                            max_score = k_avg_score
+                            best_subset = k
+                            sa = self.subsets_.__len__()
+                            # if k != sa:
+                            #     print(f"Best subset is last ({k})")
+                            # else:
+                            #     print(f"Best subset is NOT last ({k} != {sa})")
+                        else:
+                            print("Break")
+                            break
+
+                    print(f"k_avg_score: {k_avg_score:.4f} >=  "
+                          f"max_score: {max_score:.4f} - std_dev: {std_dev:.4f}"
+                          f" / scores_ammount: {scores_ammount:.4f} "
+                          f"margin: "
+                          f"{k_avg_score - (max_score - std_dev / scores_ammount):.4f}")
+
+                    print("done")
+
         except KeyboardInterrupt:
             self.interrupted_ = True
             sys.stderr.write("\nSTOPPING EARLY DUE TO KEYBOARD INTERRUPT...")
