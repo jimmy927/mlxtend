@@ -656,8 +656,10 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         print(f"k_score: {k_score:.4f} <= best_score: {best_score:.4f}")
                         early_stop_count -= 1
                         if early_stop_count == 0:
-                            print('Performances not improved for %d rounds. '
-                                  'Stopping now!' % self.early_stop_rounds)
+                            print(
+                                "Performances not improved for %d rounds. "
+                                "Stopping now!" % self.early_stop_rounds
+                            )
                             break
                     else:
                         print(f"k_score: {k_score:.4f} > best_score: {best_score:.4f}")
@@ -679,9 +681,8 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                     max_score = np.NINF
                     for k in self.subsets_:
                         if (
-                                k >= self.min_k
-                                and k <= self.max_k
-                                and self.subsets_[k]["avg_score"] > max_score
+                            self.min_k <= k <= self.max_k
+                            and self.subsets_[k]["avg_score"] > max_score
                         ):
                             max_score = self.subsets_[k]["avg_score"]
                             best_subset = k
@@ -689,9 +690,9 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         if k >= best_subset:
                             print(f"{k} is larger than best")
                         elif self.subsets_[k]["avg_score"] >= (
-                                max_score
-                                - np.std(self.subsets_[k]["cv_scores"])
-                                / self.subsets_[k]["cv_scores"].shape[0]
+                            max_score
+                            - np.std(self.subsets_[k]["cv_scores"])
+                            / self.subsets_[k]["cv_scores"].shape[0]
                         ):
                             max_score = self.subsets_[k]["avg_score"]
                             best_subset = k
