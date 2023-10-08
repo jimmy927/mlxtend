@@ -538,6 +538,7 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
         best_score = -np.inf
         early_stop_count = self.early_stop_rounds
         try:
+            features_added = {}
             while k != k_stop:
                 prev_subset = set(k_idx)
                 if self.forward:
@@ -559,6 +560,10 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                 )
 
                 k = len(k_idx)
+                for f in k_idx:
+                    if f not in features_added:
+                        features_added[f] = X.columns[f]
+                        print(f"feature added: {X.columns[f]}")
                 # floating can lead to multiple same-sized subsets
                 if k not in self.subsets_ or (k_score > self.subsets_[k]["avg_score"]):
                     k_idx = tuple(sorted(k_idx))
@@ -659,9 +664,11 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         early_stop_count = self.early_stop_rounds
                         best_score = k_score
                 sl = self.subsets_.__len__()
-                if self.tol and sl > 1:
-                    score_diff = self.subsets_[sl]["avg_score"] - self.subsets_[sl-1][
-                        "avg_score"]
+                if self.tol and (sl > 1):
+                    score_diff = (
+                        self.subsets_[sl]["avg_score"]
+                        - self.subsets_[sl - 1]["avg_score"]
+                    )
                     if score_diff < self.tol:
                         print(f"Tol reached {score_diff} < {self.tol}, break")
                         break
@@ -669,32 +676,28 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                         print(f"Tol not reached {score_diff} > {self.tol}")
 
                 if self.is_parsimonious:
-                    max_score = 0
+                    max_score = np.NINF
                     for k in self.subsets_:
-
-                        k_avg_score = self.subsets_[k]["avg_score"]
-                        std_dev = np.std(self.subsets_[k]["cv_scores"])
-                        scores_ammount = self.subsets_[k]["cv_scores"].shape[0]
-                        if k_avg_score >=  max_score - std_dev / scores_ammount:
-                            last_max_score = max_score
-                            max_score = k_avg_score
+                        if (
+                                k >= self.min_k
+                                and k <= self.max_k
+                                and self.subsets_[k]["avg_score"] > max_score
+                        ):
+                            max_score = self.subsets_[k]["avg_score"]
                             best_subset = k
-                            sa = sl
-                            # if k != sa:
-                            #     print(f"Best subset is last ({k})")
-                            # else:
-                            #     print(f"Best subset is NOT last ({k} != {sa})")
+                    for k in self.subsets_:
+                        if k >= best_subset:
+                            print(f"{k} is larger than best")
+                        elif self.subsets_[k]["avg_score"] >= (
+                                max_score
+                                - np.std(self.subsets_[k]["cv_scores"])
+                                / self.subsets_[k]["cv_scores"].shape[0]
+                        ):
+                            max_score = self.subsets_[k]["avg_score"]
+                            best_subset = k
+                            print(f"{k} is best")
                         else:
-                            print("Break")
-                            break
-
-                    print(f"k_avg_score: {k_avg_score:.4f} >=  "
-                          f"max_score: {last_max_score:.4f} - std_dev: {std_dev:.4f}"
-                          f" / scores_ammount: {scores_ammount:.4f} "
-                          f"margin: "
-                          f"{k_avg_score - (last_max_score - std_dev / scores_ammount):.4f}")
-
-                    print("done")
+                            print(f"{k} is NOT better")
 
         except KeyboardInterrupt:
             self.interrupted_ = True
@@ -743,6 +746,9 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                 ):
                     max_score = self.subsets_[k]["avg_score"]
                     best_subset = k
+                    print(f"{k} is best END")
+                else:
+                    print(f"{k} is NOT better END")
 
             k_score = max_score
             k_idx = self.subsets_[best_subset]["feature_idx"]
