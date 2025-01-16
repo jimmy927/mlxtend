@@ -1,4 +1,4 @@
-# Sebastian Raschka 2014-2023
+# Sebastian Raschka 2014-2024
 # mlxtend Machine Learning Library Extensions
 #
 # Base Regressor (Regressor Parent Class)
@@ -14,7 +14,6 @@ from .._base import _BaseModel, _IterativeModel, _Regressor
 
 
 class LinearRegression(_BaseModel, _IterativeModel, _Regressor):
-
     """Ordinary least squares linear regression.
 
     Parameters

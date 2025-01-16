@@ -1,4 +1,4 @@
-# Sebastian Raschka 2014-2023
+# Sebastian Raschka 2014-2024
 # mlxtend Machine Learning Library Extensions
 #
 # Algorithm for sequential feature selection.
@@ -25,7 +25,6 @@ from .utilities import _calc_score, _get_featurenames, _merge_lists, _preprocess
 
 
 class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
-
     """Sequential Feature Selection for Classification and Regression.
 
     Parameters
@@ -713,7 +712,11 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
         return self
 
     def finalize_fit(self):
-        max_score = np.NINF
+        if np.__version__ < "2.0":
+            ninf = np.NINF
+        else:
+            ninf = -np.inf
+        max_score = ninf
         for k in self.subsets_:
             if (
                 k >= self.min_k
@@ -724,7 +727,7 @@ class SequentialFeatureSelector(_BaseXComposition, MetaEstimatorMixin):
                 best_subset = k
 
         k_score = max_score
-        if k_score == np.NINF:
+        if k_score == ninf:
             # i.e. all keys of self.subsets_ are not in interval `[self.min_k, self.max_k]`
             # this happens if KeyboardInterrupt happens
             keys = list(self.subsets_.keys())

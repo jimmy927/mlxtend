@@ -1,6 +1,6 @@
 # OneR classifier
 
-# Sebastian Raschka 2014-2023
+# Sebastian Raschka 2014-2024
 # mlxtend Machine Learning Library Extensions
 #
 # The classic OneR (One Rule) classifier
@@ -17,7 +17,6 @@ from sklearn.exceptions import NotFittedError
 
 
 class OneRClassifier(BaseEstimator, ClassifierMixin):
-
     """OneR (One Rule) Classifier.
 
     Parameters

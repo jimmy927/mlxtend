@@ -1,4 +1,4 @@
-# Sebastian Raschka 2014-2023
+# Sebastian Raschka 2014-2024
 # mlxtend Machine Learning Library Extensions
 #
 # A counter class for printing the progress of an iterator.
@@ -11,7 +11,6 @@ import time
 
 
 class Counter(object):
-
     """Class to display the progress of for-loop iterators.
 
     Parameters

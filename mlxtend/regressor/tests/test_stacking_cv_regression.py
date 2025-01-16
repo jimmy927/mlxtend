@@ -1,6 +1,6 @@
 # Out-of-fold stacking regressor tests
 #
-# Sebastian Raschka 2014-2023
+# Sebastian Raschka 2014-2024
 #
 # mlxtend Machine Learning Library Extensions
 # Author: Eike Dehling <e.e.dehling@gmail.com>
@@ -382,6 +382,7 @@ def test_weight_unsupported_with_no_weight():
     stack.fit(X1, y).predict(X1)
 
 
+@pytest.mark.skip(reason="scikit-learn implemented a StackingRegressor in 0.22.")
 def test_gridsearch_replace_mix():
     svr_lin = SVR(kernel="linear", gamma="auto")
     ridge = Ridge(random_state=1)

@@ -1,4 +1,4 @@
-# Sebastian Raschka 2014-2023
+# Sebastian Raschka 2014-2024
 # mlxtend Machine Learning Library Extensions
 #
 # Implementation of a Multi-layer Perceptron in Tensorflow
@@ -17,7 +17,6 @@ from .._base import _BaseModel, _Classifier, _IterativeModel, _MultiClass, _Mult
 class MultiLayerPerceptron(
     _BaseModel, _IterativeModel, _MultiClass, _MultiLayer, _Classifier
 ):
-
     """Multi-layer perceptron classifier with logistic sigmoid activations
 
     Parameters
