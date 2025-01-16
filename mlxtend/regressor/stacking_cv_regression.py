@@ -221,7 +221,7 @@ class StackingCVRegressor(_BaseXComposition, RegressorMixin, TransformerMixin):
                     cv=kfold,
                     verbose=self.verbose,
                     n_jobs=self.n_jobs,
-                    fit_params=fit_params,
+                    params=fit_params,
                     pre_dispatch=self.pre_dispatch,
                 )
                 for regr in self.regr_
